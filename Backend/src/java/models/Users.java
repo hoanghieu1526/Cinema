@@ -24,6 +24,9 @@ public class Users {
     private LocalDateTime createdAt;
     private LocalDateTime updateAt;
 
+    public Users() {
+    }
+
     public Users(int userID, String fullName, String userName, String passwordHash, String phone, String email, String imageURL, UserGender gender, LocalDateTime dateOfBirth, LocalDateTime createdAt, LocalDateTime updateAt) {
         this.userID = userID;
         this.fullName = fullName;
@@ -137,6 +140,9 @@ public class Users {
     public void setUpdateAt(LocalDateTime updateAt) {
         this.updateAt = updateAt;
     }
-    
-    
+
+    @Override
+    public String toString() {
+        return "Users{" + "userID=" + userID + ", fullName=" + fullName + ", userName=" + userName + ", passwordHash=" + passwordHash + ", phone=" + phone + ", email=" + email + ", imageURL=" + imageURL + ", gender=" + gender + ", dateOfBirth=" + dateOfBirth + ", createdAt=" + createdAt + ", updateAt=" + updateAt + '}';
+    }
 }

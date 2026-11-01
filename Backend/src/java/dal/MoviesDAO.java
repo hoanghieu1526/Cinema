@@ -4,11 +4,11 @@
  */
 package dal;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -79,7 +79,11 @@ public class MoviesDAO {
                 PreparedStatement pts = conn.prepareStatement(sql)
         ) {
             pts.setString(1, movie.getMovieName());
-            pts.setInt(2, movie.getApprovedByAdminID());
+            if (movie.getApprovedByAdminID() > 0) {
+                pts.setInt(2, movie.getApprovedByAdminID());
+            } else {
+                pts.setNull(2, Types.INTEGER);
+            }
             pts.setString(3, movie.getCategory());
             pts.setString(4, movie.getBio());
             pts.setString(5, movie.getTrailerURL());
@@ -87,7 +91,7 @@ public class MoviesDAO {
             pts.setString(7, movie.getDirector());
             pts.setString(8, movie.getActor());
             pts.setObject(9, movie.getReleaseDate());
-            pts.setObject(10, movie.getCreatedAt());
+            pts.setObject(10, movie.getCreatedAt() != null ? movie.getCreatedAt() : LocalDateTime.now());
             pts.setInt(11, movie.getDuration());
             pts.setString(12, movie.getLanguage());
             pts.setBigDecimal(13, movie.getRatingScore());
@@ -109,7 +113,11 @@ public class MoviesDAO {
                 PreparedStatement pts = conn.prepareStatement(sql)
         ) {
             pts.setString(1, movie.getMovieName());
-            pts.setInt(2, movie.getApprovedByAdminID());
+            if (movie.getApprovedByAdminID() > 0) {
+                pts.setInt(2, movie.getApprovedByAdminID());
+            } else {
+                pts.setNull(2, Types.INTEGER);
+            }
             pts.setString(3, movie.getCategory());
             pts.setString(4, movie.getBio());
             pts.setString(5, movie.getTrailerURL());
@@ -117,15 +125,28 @@ public class MoviesDAO {
             pts.setString(7, movie.getDirector());
             pts.setString(8, movie.getActor());
             pts.setObject(9, movie.getReleaseDate());
-            // createdAt thường không bị update
             pts.setInt(10, movie.getDuration());
             pts.setString(11, movie.getLanguage());
             pts.setBigDecimal(12, movie.getRatingScore());
             pts.setString(13, movie.getAgeRating());
             pts.setBigDecimal(14, movie.getRate());
-            
             pts.setInt(15, movie.getMovieID());
 
+            int rowsAffected = pts.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean deleteMovie(int movieID) {
+        String sql = "DELETE FROM Movies WHERE movieID = ?";
+        try (
+                Connection conn = DBcontext.getConnection();
+                PreparedStatement pts = conn.prepareStatement(sql)
+        ) {
+            pts.setInt(1, movieID);
             int rowsAffected = pts.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {

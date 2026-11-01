@@ -56,7 +56,7 @@ public class SeatsDAO {
         }
         return null;
     }
-    
+
     // Hàm bổ sung: Lấy danh sách ghế theo phòng
     public List<Seats> getSeatsByRoomId(int roomID) {
         String sql = "SELECT * FROM Seats WHERE roomID = ?";
@@ -104,6 +104,21 @@ public class SeatsDAO {
             pts.setInt(2, seat.getRoomID());
             pts.setInt(3, seat.getSeatID());
 
+            int rowsAffected = pts.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean deleteSeat(int seatID) {
+        String sql = "DELETE FROM Seats WHERE seatID = ?";
+        try (
+                Connection conn = DBcontext.getConnection();
+                PreparedStatement pts = conn.prepareStatement(sql)
+        ) {
+            pts.setInt(1, seatID);
             int rowsAffected = pts.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {

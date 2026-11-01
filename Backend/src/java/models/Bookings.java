@@ -20,8 +20,19 @@ public class Bookings {
     private int userID;
     private int showtimeID;
 
+    public Bookings() {
+    }
+
     public Bookings(int bookingID, LocalDateTime bookingTime, BigDecimal totalAmount, BookingStatus status, int userID, int showtimeID) {
         this.bookingID = bookingID;
+        this.bookingTime = bookingTime;
+        this.totalAmount = totalAmount;
+        this.status = status;
+        this.userID = userID;
+        this.showtimeID = showtimeID;
+    }
+
+    public Bookings(LocalDateTime bookingTime, BigDecimal totalAmount, BookingStatus status, int userID, int showtimeID) {
         this.bookingTime = bookingTime;
         this.totalAmount = totalAmount;
         this.status = status;
@@ -76,7 +87,9 @@ public class Bookings {
     public void setShowtimeID(int showtimeID) {
         this.showtimeID = showtimeID;
     }
-    
 
+    @Override
+    public String toString() {
+        return "Bookings{" + "bookingID=" + bookingID + ", bookingTime=" + bookingTime + ", totalAmount=" + totalAmount + ", status=" + status + ", userID=" + userID + ", showtimeID=" + showtimeID + '}';
+    }
 }
-

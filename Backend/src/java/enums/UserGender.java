@@ -10,7 +10,6 @@ public enum UserGender {
         this.dbValue = dbValue;
     }
 
-  
     public int getDbValue() {
         return dbValue;
     }
@@ -22,7 +21,7 @@ public enum UserGender {
     public static UserGender fromString(String text) {
         if (text == null) return FEMALE; 
         String cleaned = text.trim();
-        if (cleaned.equalsIgnoreCase("MALE") || cleaned.equals("1")) {
+        if (cleaned.equalsIgnoreCase("MALE") || cleaned.equals("1") || cleaned.equalsIgnoreCase("true")) {
             return MALE;
         }
         return FEMALE;

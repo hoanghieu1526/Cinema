@@ -29,7 +29,10 @@ public class Movies {
     private String ageRating;             
     private BigDecimal rate;
 
-public Movies(int movieID, String movieName, int approvedByAdminID, String category, String bio, String trailerURL, String posterURL, String director, String actor, LocalDateTime releaseDate, LocalDateTime createdAt, int duration, String language, BigDecimal ratingScore, String ageRating, BigDecimal rate) {
+    public Movies() {
+    }
+
+    public Movies(int movieID, String movieName, int approvedByAdminID, String category, String bio, String trailerURL, String posterURL, String director, String actor, LocalDateTime releaseDate, LocalDateTime createdAt, int duration, String language, BigDecimal ratingScore, String ageRating, BigDecimal rate) {
         this.movieID = movieID;
         this.movieName = movieName;
         this.approvedByAdminID = approvedByAdminID;
@@ -41,6 +44,24 @@ public Movies(int movieID, String movieName, int approvedByAdminID, String categ
         this.actor = actor;
         this.releaseDate = releaseDate;
         this.createdAt = createdAt;
+        this.duration = duration;
+        this.language = language;
+        this.ratingScore = ratingScore;
+        this.ageRating = ageRating;
+        this.rate = rate;
+    }
+
+    public Movies(String movieName, int approvedByAdminID, String category, String bio, String trailerURL, String posterURL, String director, String actor, LocalDateTime releaseDate, LocalDateTime createdAt, int duration, String language, BigDecimal ratingScore, String ageRating, BigDecimal rate) {
+        this.movieName = movieName;
+        this.approvedByAdminID = approvedByAdminID;
+        this.category = category;
+        this.bio = bio;
+        this.trailerURL = trailerURL;
+        this.posterURL = posterURL;
+        this.director = director;
+        this.actor = actor;
+        this.releaseDate = releaseDate;
+        this.createdAt = (createdAt != null) ? createdAt : LocalDateTime.now();
         this.duration = duration;
         this.language = language;
         this.ratingScore = ratingScore;
@@ -176,6 +197,8 @@ public Movies(int movieID, String movieName, int approvedByAdminID, String categ
         this.rate = rate;
     }
 
-
-    
+    @Override
+    public String toString() {
+        return "Movies{" + "movieID=" + movieID + ", movieName=" + movieName + ", approvedByAdminID=" + approvedByAdminID + ", category=" + category + ", director=" + director + ", releaseDate=" + releaseDate + ", duration=" + duration + ", language=" + language + ", ratingScore=" + ratingScore + ", ageRating=" + ageRating + ", rate=" + rate + '}';
+    }
 }

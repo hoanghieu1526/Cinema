@@ -12,6 +12,9 @@ public class Movie_Genre {
     private int movieID;
     private int genreID;
 
+    public Movie_Genre() {
+    }
+
     public Movie_Genre(int movieID, int genreID) {
         this.movieID = movieID;
         this.genreID = genreID;
@@ -32,7 +35,9 @@ public class Movie_Genre {
     public void setGenreID(int genreID) {
         this.genreID = genreID;
     }
-    
-    
-    
+
+    @Override
+    public String toString() {
+        return "Movie_Genre{" + "movieID=" + movieID + ", genreID=" + genreID + '}';
+    }
 }

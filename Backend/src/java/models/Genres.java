@@ -12,8 +12,15 @@ public class Genres {
     private int genreID;
     private String genreName;
 
+    public Genres() {
+    }
+
     public Genres(int genreID, String genreName) {
         this.genreID = genreID;
+        this.genreName = genreName;
+    }
+
+    public Genres(String genreName) {
         this.genreName = genreName;
     }
 
@@ -32,6 +39,9 @@ public class Genres {
     public void setGenreName(String genreName) {
         this.genreName = genreName;
     }
-    
 
+    @Override
+    public String toString() {
+        return "Genres{" + "genreID=" + genreID + ", genreName=" + genreName + '}';
+    }
 }

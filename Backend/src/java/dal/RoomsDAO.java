@@ -15,12 +15,23 @@ import models.Rooms;
 
 public class RoomsDAO {
 
+    private RoomStatus parseStatus(String statusStr) {
+        if (statusStr == null || statusStr.trim().isEmpty()) {
+            return RoomStatus.STANDBY;
+        }
+        try {
+            return RoomStatus.valueOf(statusStr.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return RoomStatus.STANDBY;
+        }
+    }
+
     private Rooms mapRow(ResultSet rs) throws SQLException {
         return new Rooms(
                 rs.getInt("roomID"),
                 rs.getString("roomName"),
                 rs.getString("roomType"),
-                RoomStatus.valueOf(rs.getString("status")), 
+                parseStatus(rs.getString("status")),
                 rs.getInt("userID"),
                 rs.getInt("showtimeID")
         );
@@ -69,7 +80,7 @@ public class RoomsDAO {
         ) {
             pts.setString(1, room.getRoomName());
             pts.setString(2, room.getRoomType());
-            pts.setString(3, room.getStatus().name());
+            pts.setString(3, (room.getStatus() != null ? room.getStatus() : RoomStatus.STANDBY).name());
             pts.setInt(4, room.getUserID());
             pts.setInt(5, room.getShowtimeID());
 
@@ -89,11 +100,26 @@ public class RoomsDAO {
         ) {
             pts.setString(1, room.getRoomName());
             pts.setString(2, room.getRoomType());
-            pts.setString(3, room.getStatus().name());
+            pts.setString(3, (room.getStatus() != null ? room.getStatus() : RoomStatus.STANDBY).name());
             pts.setInt(4, room.getUserID());
             pts.setInt(5, room.getShowtimeID());
             pts.setInt(6, room.getRoomID());
 
+            int rowsAffected = pts.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean deleteRoom(int roomID) {
+        String sql = "DELETE FROM Rooms WHERE roomID = ?";
+        try (
+                Connection conn = DBcontext.getConnection();
+                PreparedStatement pts = conn.prepareStatement(sql)
+        ) {
+            pts.setInt(1, roomID);
             int rowsAffected = pts.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {

@@ -88,4 +88,19 @@ public class GenresDAO {
         }
         return false;
     }
+
+    public boolean deleteGenre(int genreID) {
+        String sql = "DELETE FROM Genres WHERE genreID = ?";
+        try (
+                Connection conn = DBcontext.getConnection();
+                PreparedStatement pts = conn.prepareStatement(sql)
+        ) {
+            pts.setInt(1, genreID);
+            int rowsAffected = pts.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

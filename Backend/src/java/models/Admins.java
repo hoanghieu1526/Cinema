@@ -22,6 +22,9 @@ public class Admins {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    public Admins() {
+    }
+
     public Admins(int adminID, String fullName, String account, String passwordHash, String phone, String email, AdminRole roles, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.adminID = adminID;
         this.fullName = fullName;
@@ -42,7 +45,6 @@ public class Admins {
         this.email = email;
         this.roles = AdminRole.MOVIES_MANAGER;
         this.createdAt = LocalDateTime.now();
-        
     }
 
     public int getAdminID() {
@@ -121,6 +123,4 @@ public class Admins {
     public String toString() {
         return "Admins{" + "adminID=" + adminID + ", fullName=" + fullName + ", account=" + account + ", passwordHash=" + passwordHash + ", phone=" + phone + ", email=" + email + ", roles=" + roles + ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + '}';
     }
-    
-
 }

@@ -13,8 +13,16 @@ public class Seats {
     private String seatName;
     private int roomID;
 
+    public Seats() {
+    }
+
     public Seats(int seatID, String seatName, int roomID) {
         this.seatID = seatID;
+        this.seatName = seatName;
+        this.roomID = roomID;
+    }
+
+    public Seats(String seatName, int roomID) {
         this.seatName = seatName;
         this.roomID = roomID;
     }
@@ -42,6 +50,9 @@ public class Seats {
     public void setRoomID(int roomID) {
         this.roomID = roomID;
     }
-    
-    
+
+    @Override
+    public String toString() {
+        return "Seats{" + "seatID=" + seatID + ", seatName=" + seatName + ", roomID=" + roomID + '}';
+    }
 }

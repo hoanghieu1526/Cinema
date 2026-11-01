@@ -9,12 +9,22 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import models.Showtimes;
 
 public class ShowtimesDAO {
+
+    private ShowtimeStatus parseStatus(String statusStr) {
+        if (statusStr == null || statusStr.trim().isEmpty()) {
+            return ShowtimeStatus.UPCOMING;
+        }
+        try {
+            return ShowtimeStatus.valueOf(statusStr.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return ShowtimeStatus.UPCOMING;
+        }
+    }
 
     private Showtimes mapRow(ResultSet rs) throws SQLException {
         return new Showtimes(
@@ -23,7 +33,7 @@ public class ShowtimesDAO {
                 rs.getInt("roomID"),
                 rs.getObject("startTime", java.time.LocalDateTime.class),
                 rs.getObject("endTime", java.time.LocalDateTime.class),
-                ShowtimeStatus.valueOf(rs.getString("status"))
+                parseStatus(rs.getString("status"))
         );
     }
 
@@ -72,7 +82,7 @@ public class ShowtimesDAO {
             pts.setInt(2, showtime.getRoomID());
             pts.setObject(3, showtime.getStartTime());
             pts.setObject(4, showtime.getEndTime());
-            pts.setString(5, showtime.getStatus().name());
+            pts.setString(5, (showtime.getStatus() != null ? showtime.getStatus() : ShowtimeStatus.UPCOMING).name());
 
             int rowsAffected = pts.executeUpdate();
             return rowsAffected > 0;
@@ -92,9 +102,24 @@ public class ShowtimesDAO {
             pts.setInt(2, showtime.getRoomID());
             pts.setObject(3, showtime.getStartTime());
             pts.setObject(4, showtime.getEndTime());
-            pts.setString(5, showtime.getStatus().name());
+            pts.setString(5, (showtime.getStatus() != null ? showtime.getStatus() : ShowtimeStatus.UPCOMING).name());
             pts.setInt(6, showtime.getShowtimeID());
 
+            int rowsAffected = pts.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean deleteShowtime(int showtimeID) {
+        String sql = "DELETE FROM Showtimes WHERE showtimeID = ?";
+        try (
+                Connection conn = DBcontext.getConnection();
+                PreparedStatement pts = conn.prepareStatement(sql)
+        ) {
+            pts.setInt(1, showtimeID);
             int rowsAffected = pts.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {

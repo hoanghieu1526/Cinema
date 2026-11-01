@@ -4,7 +4,6 @@
  */
 package dal;
 
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,7 +18,7 @@ public class TicketsDAO {
         return new Tickets(
                 rs.getInt("ticketID"),
                 rs.getBigDecimal("price"),
-                rs.getInt("roomID"), 
+                rs.getInt("roomID"),
                 rs.getInt("seatID"),
                 rs.getInt("bookingID")
         );
@@ -59,7 +58,7 @@ public class TicketsDAO {
         }
         return null;
     }
-    
+
     public List<Tickets> getTicketsByBookingId(int bookingID) {
         String sql = "SELECT * FROM Tickets WHERE bookingID = ?";
         List<Tickets> ticketsList = new ArrayList<>();
@@ -110,6 +109,21 @@ public class TicketsDAO {
             pts.setInt(4, ticket.getBookingID());
             pts.setInt(5, ticket.getTicketID());
 
+            int rowsAffected = pts.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean deleteTicket(int ticketID) {
+        String sql = "DELETE FROM Tickets WHERE ticketID = ?";
+        try (
+                Connection conn = DBcontext.getConnection();
+                PreparedStatement pts = conn.prepareStatement(sql)
+        ) {
+            pts.setInt(1, ticketID);
             int rowsAffected = pts.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {

@@ -16,6 +16,8 @@ import models.Users;
 
 public class UsersDAO {
 
+    private static Boolean genderColumnNumeric = null;
+
     private Users mapRow(ResultSet rs) throws SQLException {
         return new Users(
                 rs.getInt("userID"),
@@ -25,11 +27,36 @@ public class UsersDAO {
                 rs.getString("phone"),
                 rs.getString("email"),
                 rs.getString("imageURL"),
-                UserGender.valueOf(rs.getString("gender")),
+                UserGender.fromString(rs.getString("gender")),
                 rs.getObject("dateOfBirth", java.time.LocalDateTime.class),
                 rs.getObject("createdAt", java.time.LocalDateTime.class),
                 rs.getObject("updateAt", java.time.LocalDateTime.class)
         );
+    }
+
+    private void setGenderParam(Connection conn, PreparedStatement pts, int paramIndex, UserGender gender) throws SQLException {
+        UserGender safeGender = (gender != null) ? gender : UserGender.FEMALE;
+        if (isGenderColumnNumeric(conn)) {
+            pts.setInt(paramIndex, safeGender.getDbValue());
+        } else {
+            pts.setString(paramIndex, safeGender.name());
+        }
+    }
+
+    private boolean isGenderColumnNumeric(Connection conn) {
+        if (genderColumnNumeric != null) {
+            return genderColumnNumeric;
+        }
+        String sql = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE LOWER(TABLE_NAME) = 'users' AND LOWER(COLUMN_NAME) = 'gender'";
+        try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                String type = rs.getString(1).toLowerCase();
+                genderColumnNumeric = type.contains("bit") || type.contains("int") || type.contains("numeric") || type.contains("decimal");
+                return genderColumnNumeric;
+            }
+        } catch (SQLException ignored) {
+        }
+        return false;
     }
 
     public List<Users> getAllUsers() {
@@ -66,8 +93,7 @@ public class UsersDAO {
         }
         return null;
     }
-    
-    
+
     public Users getUserByUserName(String userName) {
         String sql = "SELECT * FROM Users WHERE userName = ?";
         try (
@@ -116,9 +142,9 @@ public class UsersDAO {
             pts.setString(4, user.getPhone());
             pts.setString(5, user.getEmail());
             pts.setString(6, user.getImageURL());
-            pts.setString(7, user.getGender().name());
+            setGenderParam(conn, pts, 7, user.getGender());
             pts.setObject(8, user.getDateOfBirth());
-            pts.setObject(9, user.getCreatedAt());
+            pts.setObject(9, user.getCreatedAt() != null ? user.getCreatedAt() : LocalDateTime.now());
 
             int rowsAffected = pts.executeUpdate();
             return rowsAffected > 0;
@@ -140,11 +166,26 @@ public class UsersDAO {
             pts.setString(4, user.getPhone());
             pts.setString(5, user.getEmail());
             pts.setString(6, user.getImageURL());
-            pts.setString(7, user.getGender().name());
+            setGenderParam(conn, pts, 7, user.getGender());
             pts.setObject(8, user.getDateOfBirth());
             pts.setObject(9, LocalDateTime.now());
             pts.setInt(10, user.getUserID());
 
+            int rowsAffected = pts.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean deleteUser(int userID) {
+        String sql = "DELETE FROM Users WHERE userID = ?";
+        try (
+                Connection conn = DBcontext.getConnection();
+                PreparedStatement pts = conn.prepareStatement(sql)
+        ) {
+            pts.setInt(1, userID);
             int rowsAffected = pts.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {

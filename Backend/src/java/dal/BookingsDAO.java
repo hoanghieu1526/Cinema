@@ -1,7 +1,6 @@
 package dal;
 
 import enums.BookingStatus;
-import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,12 +12,23 @@ import models.Bookings;
 
 public class BookingsDAO {
 
+    private BookingStatus parseStatus(String statusStr) {
+        if (statusStr == null || statusStr.trim().isEmpty()) {
+            return BookingStatus.PENDING;
+        }
+        try {
+            return BookingStatus.valueOf(statusStr.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            return BookingStatus.PENDING;
+        }
+    }
+
     private Bookings mapRow(ResultSet rs) throws SQLException {
         return new Bookings(
                 rs.getInt("bookingID"),
                 rs.getObject("bookingTime", java.time.LocalDateTime.class),
                 rs.getBigDecimal("totalAmount"),
-                BookingStatus.valueOf(rs.getString("status")),
+                parseStatus(rs.getString("status")),
                 rs.getInt("userID"),
                 rs.getInt("showtimeID")
         );
@@ -65,9 +75,9 @@ public class BookingsDAO {
                 Connection conn = DBcontext.getConnection();
                 PreparedStatement pts = conn.prepareStatement(sql)
         ) {
-            pts.setObject(1, booking.getBookingTime());
+            pts.setObject(1, booking.getBookingTime() != null ? booking.getBookingTime() : LocalDateTime.now());
             pts.setBigDecimal(2, booking.getTotalAmount());
-            pts.setString(3, booking.getStatus().name()); 
+            pts.setString(3, (booking.getStatus() != null ? booking.getStatus() : BookingStatus.PENDING).name());
             pts.setInt(4, booking.getUserID());
             pts.setInt(5, booking.getShowtimeID());
 
@@ -87,12 +97,26 @@ public class BookingsDAO {
         ) {
             pts.setObject(1, booking.getBookingTime());
             pts.setBigDecimal(2, booking.getTotalAmount());
-            pts.setString(3, booking.getStatus().name());
+            pts.setString(3, (booking.getStatus() != null ? booking.getStatus() : BookingStatus.PENDING).name());
             pts.setInt(4, booking.getUserID());
             pts.setInt(5, booking.getShowtimeID());
-            
-            pts.setInt(6, booking.getBookingID()); 
+            pts.setInt(6, booking.getBookingID());
 
+            int rowsAffected = pts.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean deleteBooking(int bookingID) {
+        String sql = "DELETE FROM Bookings WHERE bookingID = ?";
+        try (
+                Connection conn = DBcontext.getConnection();
+                PreparedStatement pts = conn.prepareStatement(sql)
+        ) {
+            pts.setInt(1, bookingID);
             int rowsAffected = pts.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {

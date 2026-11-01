@@ -18,8 +18,19 @@ public class Rooms {
     private int userID;
     private int showtimeID;
 
+    public Rooms() {
+    }
+
     public Rooms(int roomID, String roomName, String roomType, RoomStatus status, int userID, int showtimeID) {
         this.roomID = roomID;
+        this.roomName = roomName;
+        this.roomType = roomType;
+        this.status = status;
+        this.userID = userID;
+        this.showtimeID = showtimeID;
+    }
+
+    public Rooms(String roomName, String roomType, RoomStatus status, int userID, int showtimeID) {
         this.roomName = roomName;
         this.roomType = roomType;
         this.status = status;
@@ -74,6 +85,9 @@ public class Rooms {
     public void setShowtimeID(int showtimeID) {
         this.showtimeID = showtimeID;
     }
-    
-    
+
+    @Override
+    public String toString() {
+        return "Rooms{" + "roomID=" + roomID + ", roomName=" + roomName + ", roomType=" + roomType + ", status=" + status + ", userID=" + userID + ", showtimeID=" + showtimeID + '}';
+    }
 }

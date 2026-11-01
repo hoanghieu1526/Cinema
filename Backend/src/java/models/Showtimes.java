@@ -19,8 +19,19 @@ public class Showtimes {
     private LocalDateTime endTime;
     private ShowtimeStatus status;
 
+    public Showtimes() {
+    }
+
     public Showtimes(int showtimeID, int movieID, int roomID, LocalDateTime startTime, LocalDateTime endTime, ShowtimeStatus status) {
         this.showtimeID = showtimeID;
+        this.movieID = movieID;
+        this.roomID = roomID;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.status = status;
+    }
+
+    public Showtimes(int movieID, int roomID, LocalDateTime startTime, LocalDateTime endTime, ShowtimeStatus status) {
         this.movieID = movieID;
         this.roomID = roomID;
         this.startTime = startTime;
@@ -75,6 +86,9 @@ public class Showtimes {
     public void setStatus(ShowtimeStatus status) {
         this.status = status;
     }
-    
-    
+
+    @Override
+    public String toString() {
+        return "Showtimes{" + "showtimeID=" + showtimeID + ", movieID=" + movieID + ", roomID=" + roomID + ", startTime=" + startTime + ", endTime=" + endTime + ", status=" + status + '}';
+    }
 }
