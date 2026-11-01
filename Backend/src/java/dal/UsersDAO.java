@@ -16,8 +16,6 @@ import models.Users;
 
 public class UsersDAO {
 
-    private static Boolean genderColumnNumeric = null;
-
     private Users mapRow(ResultSet rs) throws SQLException {
         return new Users(
                 rs.getInt("userID"),
@@ -32,31 +30,6 @@ public class UsersDAO {
                 rs.getObject("createdAt", java.time.LocalDateTime.class),
                 rs.getObject("updateAt", java.time.LocalDateTime.class)
         );
-    }
-
-    private void setGenderParam(Connection conn, PreparedStatement pts, int paramIndex, UserGender gender) throws SQLException {
-        UserGender safeGender = (gender != null) ? gender : UserGender.FEMALE;
-        if (isGenderColumnNumeric(conn)) {
-            pts.setInt(paramIndex, safeGender.getDbValue());
-        } else {
-            pts.setString(paramIndex, safeGender.name());
-        }
-    }
-
-    private boolean isGenderColumnNumeric(Connection conn) {
-        if (genderColumnNumeric != null) {
-            return genderColumnNumeric;
-        }
-        String sql = "SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE LOWER(TABLE_NAME) = 'users' AND LOWER(COLUMN_NAME) = 'gender'";
-        try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                String type = rs.getString(1).toLowerCase();
-                genderColumnNumeric = type.contains("bit") || type.contains("int") || type.contains("numeric") || type.contains("decimal");
-                return genderColumnNumeric;
-            }
-        } catch (SQLException ignored) {
-        }
-        return false;
     }
 
     public List<Users> getAllUsers() {
@@ -136,13 +109,14 @@ public class UsersDAO {
                 Connection conn = DBcontext.getConnection();
                 PreparedStatement pts = conn.prepareStatement(sql)
         ) {
+            UserGender safeGender = (user.getGender() != null) ? user.getGender() : UserGender.FEMALE;
             pts.setString(1, user.getFullName());
             pts.setString(2, user.getUserName());
             pts.setString(3, user.getPasswordHash());
             pts.setString(4, user.getPhone());
             pts.setString(5, user.getEmail());
             pts.setString(6, user.getImageURL());
-            setGenderParam(conn, pts, 7, user.getGender());
+            pts.setInt(7, safeGender.getDbValue());
             pts.setObject(8, user.getDateOfBirth());
             pts.setObject(9, user.getCreatedAt() != null ? user.getCreatedAt() : LocalDateTime.now());
 
@@ -160,13 +134,14 @@ public class UsersDAO {
                 Connection conn = DBcontext.getConnection();
                 PreparedStatement pts = conn.prepareStatement(sql)
         ) {
+            UserGender safeGender = (user.getGender() != null) ? user.getGender() : UserGender.FEMALE;
             pts.setString(1, user.getFullName());
             pts.setString(2, user.getUserName());
             pts.setString(3, user.getPasswordHash());
             pts.setString(4, user.getPhone());
             pts.setString(5, user.getEmail());
             pts.setString(6, user.getImageURL());
-            setGenderParam(conn, pts, 7, user.getGender());
+            pts.setInt(7, safeGender.getDbValue());
             pts.setObject(8, user.getDateOfBirth());
             pts.setObject(9, LocalDateTime.now());
             pts.setInt(10, user.getUserID());

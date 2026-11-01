@@ -125,19 +125,10 @@ public class CheckAllCrud {
         try {
             UserGender g0 = UserGender.fromString("0");
             UserGender g1 = UserGender.fromString("1");
-            boolean hasSafeGenderHelper = false;
-            for (Method m : UsersDAO.class.getDeclaredMethods()) {
-                if ("setGenderParam".equals(m.getName())) {
-                    hasSafeGenderHelper = true;
-                    break;
-                }
-            }
-            if (g0 == UserGender.FEMALE && g1 == UserGender.MALE && hasSafeGenderHelper) {
-                pass("UsersDAO & UserGender", "Đã đồng bộ đọc/ghi UserGender an toàn qua UserGender.fromString() và setGenderParam().");
+            if (g0 == UserGender.FEMALE && g1 == UserGender.MALE) {
+                pass("UsersDAO & UserGender", "Đã đồng bộ đọc/ghi UserGender qua fromString() và getDbValue() (0/1).");
             } else {
-                warn("UsersDAO & UserGender",
-                        "UserGender đã có hàm fromString() và fromDbValue() hỗ trợ '0'/'1', NHƯNG UsersDAO.mapRow() (dòng 28) lại gọi UserGender.valueOf(rs.getString(\"gender\")). "
-                        + "Nếu cột gender trong DB lưu 0/1 (BIT/INT) hoặc chữ thường thì UsersDAO sẽ văng lỗi IllegalArgumentException!");
+                fail("UserGender", "fromString('0'/'1') trả về không đúng.");
             }
         } catch (Exception e) {
             fail("UserGender", "Lỗi kiểm tra enum UserGender: " + e.getMessage());
