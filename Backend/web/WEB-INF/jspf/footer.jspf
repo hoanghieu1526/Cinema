@@ -1,0 +1,10 @@
+<%@ page pageEncoding="UTF-8" %>
+<footer class="footer">
+    <div class="wrap">
+        <span><b>CINEVERSE</b> — Hệ thống đặt vé xem phim</span>
+        <span>Đồ án Java Web · JSP &amp; Servlet · SQL Server</span>
+    </div>
+</footer>
+<script src="${ctx}/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<%@ page pageEncoding="UTF-8" %>
+<%--
+    Đầu trang dùng chung. Trang nhúng cần đặt trước khi include:
+      <c:set var="pageTitle" value="..."/>   tiêu đề tab trình duyệt
+      <c:set var="nav" value="movies|tickets|admin"/>   mục menu đang chọn
+--%>
+<c:set var="ctx" value="${pageContext.request.contextPath}"/>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><c:out value="${pageTitle}"/> · CINEVERSE</title>
+    <link rel="stylesheet" href="${ctx}/css/style.css">
+</head>
+<body>
+<header class="topbar">
+    <div class="wrap topbar-inner">
+        <a class="brand" href="${ctx}/home"><span>CINE</span>VERSE</a>
+
+        <nav class="menu" aria-label="Menu chính">
+            <a href="${ctx}/home" class="${nav == 'movies' ? 'on' : ''}">Phim</a>
+            <a href="${ctx}/tickets" class="${nav == 'tickets' ? 'on' : ''}">Vé của tôi</a>
+            <c:if test="${not empty sessionScope.currentAdmin}">
+                <a href="${ctx}/admin" class="${nav == 'admin' ? 'on' : ''}">Quản trị</a>
+            </c:if>
+        </nav>
+
+        <form class="search" action="${ctx}/home" method="get" role="search">
+            <input type="search" name="q" placeholder="Tìm phim, đạo diễn, diễn viên…"
+                   value="<c:out value='${param.q}'/>" aria-label="Tìm phim">
+        </form>
+
+        <div class="account">
+            <c:choose>
+                <c:when test="${not empty sessionScope.currentUser}">
+                    <span class="avatar" aria-hidden="true"><c:out value="${sessionScope.currentUser.fullName.substring(0, 1).toUpperCase()}"/></span>
+                    <span class="who"><c:out value="${sessionScope.currentUser.fullName}"/></span>
+                    <a class="btn btn-ghost btn-sm" href="${ctx}/auth?action=logout">Đăng xuất</a>
+                </c:when>
+                <c:when test="${not empty sessionScope.currentAdmin}">
+                    <span class="avatar avatar-admin" aria-hidden="true">A</span>
+                    <span class="who"><c:out value="${sessionScope.currentAdmin.fullName}"/></span>
+                    <a class="btn btn-ghost btn-sm" href="${ctx}/auth?action=logout">Đăng xuất</a>
+                </c:when>
+                <c:otherwise>
+                    <a class="btn btn-ghost btn-sm" href="${ctx}/auth">Đăng nhập</a>
+                    <a class="btn btn-primary btn-sm" href="${ctx}/auth?tab=register">Đăng ký</a>
+                </c:otherwise>
+            </c:choose>
+        </div>
+    </div>
+</header>

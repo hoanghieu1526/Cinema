@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -76,7 +77,7 @@ public class MoviesDAO {
         String sql = "INSERT INTO Movies (movieName, approvedByAdminID, category, bio, trailerURL, posterURL, director, actor, releaseDate, createdAt, duration, language, ratingScore, ageRating, rate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (
                 Connection conn = DBcontext.getConnection();
-                PreparedStatement pts = conn.prepareStatement(sql)
+                PreparedStatement pts = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
         ) {
             pts.setString(1, movie.getMovieName());
             if (movie.getApprovedByAdminID() > 0) {
@@ -99,6 +100,14 @@ public class MoviesDAO {
             pts.setBigDecimal(15, movie.getRate());
 
             int rowsAffected = pts.executeUpdate();
+            if (rowsAffected > 0) {
+                // Trả movieID vừa sinh về cho đối tượng, để nơi gọi gắn thể loại (Movie_Genre).
+                try (ResultSet keys = pts.getGeneratedKeys()) {
+                    if (keys.next()) {
+                        movie.setMovieID(keys.getInt(1));
+                    }
+                }
+            }
             return rowsAffected > 0;
         } catch (SQLException e) {
             e.printStackTrace();

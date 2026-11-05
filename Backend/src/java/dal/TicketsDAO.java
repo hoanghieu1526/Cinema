@@ -9,10 +9,54 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import models.Tickets;
 
 public class TicketsDAO {
+
+    // Mã các ghế đã có người đặt ở một suất chiếu (vé của đơn CANCELLED không tính).
+    public Set<Integer> getBookedSeatIds(int showtimeID) {
+        String sql = "SELECT t.seatID FROM Tickets t JOIN Bookings b ON b.bookingID = t.bookingID "
+                + "WHERE b.showtimeID = ? AND b.status <> 'CANCELLED'";
+        Set<Integer> seatIds = new HashSet<>();
+        try (
+                Connection conn = DBcontext.getConnection();
+                PreparedStatement pts = conn.prepareStatement(sql)
+        ) {
+            pts.setInt(1, showtimeID);
+            try (ResultSet rs = pts.executeQuery()) {
+                while (rs.next()) {
+                    seatIds.add(rs.getInt(1));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return seatIds;
+    }
+
+    // showtimeID -> số ghế đã đặt (đơn CANCELLED không tính), lấy bằng 1 truy vấn cho cả danh sách suất chiếu.
+    public Map<Integer, Integer> getBookedCountByShowtime() {
+        String sql = "SELECT b.showtimeID, COUNT(*) FROM Tickets t JOIN Bookings b ON b.bookingID = t.bookingID "
+                + "WHERE b.status <> 'CANCELLED' GROUP BY b.showtimeID";
+        Map<Integer, Integer> counts = new HashMap<>();
+        try (
+                Connection conn = DBcontext.getConnection();
+                PreparedStatement pts = conn.prepareStatement(sql);
+                ResultSet rs = pts.executeQuery()
+        ) {
+            while (rs.next()) {
+                counts.put(rs.getInt(1), rs.getInt(2));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return counts;
+    }
 
     private Tickets mapRow(ResultSet rs) throws SQLException {
         return new Tickets(
