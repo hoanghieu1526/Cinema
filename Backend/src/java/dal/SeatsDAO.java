@@ -94,6 +94,30 @@ public class SeatsDAO {
         return false;
     }
 
+    // Thêm nhiều ghế trong 1 transaction: hoặc thêm đủ tất cả, hoặc không thêm ghế nào.
+    public boolean insertSeats(List<Seats> seats) {
+        String sql = "INSERT INTO Seats (seatName, roomID) VALUES (?, ?)";
+        try (Connection conn = DBcontext.getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement pts = conn.prepareStatement(sql)) {
+                for (Seats seat : seats) {
+                    pts.setString(1, seat.getSeatName());
+                    pts.setInt(2, seat.getRoomID());
+                    pts.addBatch();
+                }
+                pts.executeBatch();
+                conn.commit();
+                return true;
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public boolean updateSeat(Seats seat) {
         String sql = "UPDATE Seats SET seatName = ?, roomID = ? WHERE seatID = ?";
         try (
